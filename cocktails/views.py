@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 import os
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import api_view
 from rest_framework_api_key.permissions import HasAPIKey
@@ -27,6 +29,7 @@ class CocktailIngestView(APIView):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def create_superuser(request):
     User = get_user_model()
 
@@ -35,8 +38,7 @@ def create_superuser(request):
     password = os.getenv("DJANGO_SUPERUSER_PASSWORD", "admin123")
 
     if User.objects.filter(username=username).exists():
-        return Response({"detail": "Superuser zaten var."}, status=status.HTTP_200_OK)
+        return Response({"detail": "Superuser zaten var."})
 
     User.objects.create_superuser(username=username, email=email, password=password)
-
-    return Response({"detail": "Superuser oluşturuldu!"}, status=status.HTTP_201_CREATED)
+    return Response({"detail": "Superuser oluşturuldu!"})
